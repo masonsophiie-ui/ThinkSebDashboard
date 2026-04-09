@@ -1,0 +1,935 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Studio Ops — First 30 Days</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --void: #0A1E14;
+    --void-soft: #17332A;
+    --void-up: #1F3E32;
+    --chalk: #FFFFFF;
+    --chalk-soft: #C5D0C9;
+    --chalk-muted: #6E8278;
+    --line: #244438;
+    --lime: #EFE5C9;
+    --lime-dim: #9FB8A6;
+    --amber: #E8C46B;
+    --red: #E8916B;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body {
+    background: var(--void);
+    color: var(--chalk);
+    font-family: 'Inter Tight', system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  body {
+    min-height: 100vh;
+    padding: 100px 56px 80px;
+    background-color: var(--void);
+    background-image:
+      radial-gradient(circle at 85% 5%, rgba(239, 229, 201, 0.05), transparent 40%),
+      radial-gradient(circle at 10% 90%, rgba(159, 184, 166, 0.04), transparent 50%),
+      radial-gradient(rgba(239, 229, 201, 0.035) 1px, transparent 1px);
+    background-size: auto, auto, 22px 22px;
+    background-position: 0 0, 0 0, 0 0;
+  }
+  .mono { font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; font-weight: 400; }
+
+  /* Header */
+  header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    padding-bottom: 28px;
+    border-bottom: 1px solid var(--line);
+    margin-bottom: 40px;
+  }
+  .brand { display: flex; flex-direction: column; gap: 10px; }
+  .brand .eyebrow { color: var(--chalk-muted); display: flex; align-items: center; gap: 10px; }
+  .smiley {
+    display: inline-block;
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'><circle cx='10' cy='10' r='10' fill='%23EFE5C9'/><circle cx='7' cy='8' r='1.3' fill='%230A1E14'/><circle cx='13' cy='8' r='1.3' fill='%230A1E14'/><path d='M 6 11.5 Q 10 14.8 14 11.5' stroke='%230A1E14' stroke-width='1.4' fill='none' stroke-linecap='round'/></svg>");
+    background-size: contain;
+    background-repeat: no-repeat;
+  }
+  .brand h1 {
+    font-size: 68px;
+    font-weight: 500;
+    letter-spacing: -0.04em;
+    line-height: 0.92;
+  }
+  .brand h1 .lime-dot { color: var(--lime); }
+  .meta { text-align: right; display: flex; flex-direction: column; gap: 6px; color: var(--chalk-soft); }
+  .meta .week { font-size: 30px; font-weight: 500; letter-spacing: -0.02em; color: var(--chalk); }
+
+  /* Intro note */
+  .note {
+    max-width: 700px;
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--chalk-soft);
+    margin-bottom: 44px;
+    padding: 20px 24px;
+    background: var(--void-soft);
+    border: 1px solid var(--line);
+    border-left: 2px solid var(--lime);
+  }
+  .note strong { color: var(--chalk); font-weight: 600; }
+
+  /* Floating nav pill */
+  .nav-pill {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    right: 20px;
+    z-index: 100;
+    background: rgba(23, 51, 42, 0.72);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border: 1px solid var(--line);
+    padding: 14px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+  }
+  .nav-pill .nav-logo { display: flex; align-items: center; gap: 14px; }
+  .nav-pill .nav-mark {
+    width: 20px;
+    height: 20px;
+    color: var(--lime);
+    flex-shrink: 0;
+    display: block;
+  }
+  .nav-pill .nav-wordmark {
+    font-family: 'Inter Tight', sans-serif;
+    font-weight: 600;
+    font-size: 13px;
+    color: var(--chalk);
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+  }
+  .nav-pill .nav-date {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--chalk-muted);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .nav-pill .nav-date-num { color: var(--chalk); font-weight: 500; font-size: 12px; letter-spacing: 0.06em; }
+
+  /* Sparkline inside stat */
+  .sparkline-wrap { margin-top: 8px; display: flex; align-items: center; gap: 10px; }
+  .sparkline { color: var(--lime); width: 88px; height: 22px; display: block; overflow: visible; }
+  .sparkline-label { font-size: 9px; color: var(--chalk-muted); font-family: 'JetBrains Mono', monospace; letter-spacing: 0.08em; text-transform: uppercase; }
+
+  /* Timezone strip */
+  .timezones {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    background: var(--void-soft);
+    border: 1px solid var(--line);
+    margin-bottom: 48px;
+    margin-top: -24px;
+  }
+  .tz {
+    padding: 18px 22px;
+    border-right: 1px solid var(--line);
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+  }
+  .tz:last-child { border-right: none; }
+  .tz-city { color: var(--chalk-muted); font-size: 10px; }
+  .tz-time { color: var(--chalk); font-size: 20px; font-weight: 500; font-variant-numeric: tabular-nums; letter-spacing: -0.02em; font-family: 'Inter Tight', sans-serif; }
+
+  /* Blockers */
+  .blockers { background: var(--void-soft); border: 1px solid var(--line); padding: 4px 20px; }
+  .blocker {
+    padding: 16px 0;
+    border-bottom: 1px solid var(--line);
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 12px;
+    align-items: center;
+  }
+  .blocker:last-child { border-bottom: none; }
+  .blocker-title { font-size: 14px; color: var(--chalk); font-weight: 500; }
+  .blocker-detail { font-size: 10px; color: var(--chalk-muted); font-family: 'JetBrains Mono', monospace; letter-spacing: 0.08em; text-transform: uppercase; margin-top: 4px; }
+  .blocker-days { font-size: 10px; color: var(--red); font-family: 'JetBrains Mono', monospace; letter-spacing: 0.1em; text-transform: uppercase; font-weight: 500; white-space: nowrap; }
+
+  /* Recently shipped */
+  .shipped-section { margin-top: 56px; }
+  .shipped { background: var(--void-soft); border: 1px solid var(--line); padding: 4px 20px; }
+  .ship-item {
+    display: grid;
+    grid-template-columns: 1fr 72px;
+    gap: 16px;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--line);
+    align-items: center;
+  }
+  .ship-item:last-child { border-bottom: none; }
+  .ship-name { font-size: 14px; color: var(--chalk); font-weight: 500; }
+  .ship-client { font-size: 10px; color: var(--chalk-muted); font-family: 'JetBrains Mono', monospace; letter-spacing: 0.08em; text-transform: uppercase; margin-top: 4px; }
+  .ship-date { font-size: 10px; color: var(--lime-dim); font-family: 'JetBrains Mono', monospace; letter-spacing: 0.1em; text-transform: uppercase; text-align: right; font-weight: 500; }
+
+  /* Win rate badge (inside pipeline h2) */
+  .win-rate {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 6px 14px;
+    background: var(--void);
+    border: 1px solid var(--line);
+    margin-left: 16px;
+  }
+  .win-rate .wr-label { font-size: 9px; color: var(--chalk-muted); font-family: 'JetBrains Mono', monospace; letter-spacing: 0.12em; text-transform: uppercase; }
+  .win-rate .wr-value { font-size: 13px; color: var(--lime); font-weight: 600; font-family: 'JetBrains Mono', monospace; letter-spacing: 0.04em; }
+
+  /* Morning briefing */
+  .briefing {
+    display: grid;
+    grid-template-columns: 220px 1fr;
+    gap: 40px;
+    margin-bottom: 48px;
+    padding: 36px 0;
+    border-top: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+    align-items: start;
+  }
+  .briefing-label {
+    color: var(--chalk-muted);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding-top: 8px;
+  }
+  .briefing-text {
+    font-size: 24px;
+    line-height: 1.45;
+    font-weight: 400;
+    color: var(--chalk);
+    letter-spacing: -0.015em;
+  }
+  .briefing-text strong {
+    color: var(--lime);
+    font-weight: 500;
+  }
+
+  /* Stat row */
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    margin-bottom: 48px;
+    background: var(--void-soft);
+    border: 1px solid var(--line);
+  }
+  .stat {
+    padding: 28px 28px;
+    border-right: 1px solid var(--line);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .stat:last-child { border-right: none; }
+  .stat .label { color: var(--chalk-muted); }
+  .stat .value {
+    font-size: 52px;
+    font-weight: 500;
+    letter-spacing: -0.04em;
+    line-height: 1;
+    color: var(--chalk);
+  }
+  .stat .delta { font-size: 11px; color: var(--chalk-muted); font-family: 'JetBrains Mono', monospace; letter-spacing: 0.06em; text-transform: uppercase; }
+  .stat .delta.up { color: var(--lime); }
+  .stat .delta.down { color: var(--red); }
+
+  /* Main grid */
+  .grid {
+    display: grid;
+    grid-template-columns: 1.6fr 1fr;
+    gap: 48px;
+  }
+
+  section h2 {
+    font-size: 24px;
+    font-weight: 500;
+    letter-spacing: -0.02em;
+    margin-bottom: 24px;
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+  }
+  section h2 .count { color: var(--chalk-muted); font-size: 10px; font-family: 'JetBrains Mono', monospace; letter-spacing: 0.12em; text-transform: uppercase; }
+
+  /* Projects */
+  .projects { background: var(--void-soft); border: 1px solid var(--line); padding: 4px 20px; }
+  .project {
+    display: grid;
+    grid-template-columns: 1fr 100px 130px 70px;
+    gap: 16px;
+    padding: 20px 4px;
+    border-bottom: 1px solid var(--line);
+    align-items: center;
+    transition: background 0.2s, padding 0.2s;
+  }
+  .project:hover { background: var(--void-up); padding-left: 12px; padding-right: 12px; }
+  .project .name { font-size: 16px; font-weight: 500; line-height: 1.3; color: var(--chalk); }
+  .project .client { font-size: 10px; color: var(--chalk-muted); margin-top: 5px; font-family: 'JetBrains Mono', monospace; letter-spacing: 0.06em; text-transform: uppercase; }
+  .phase {
+    display: inline-flex;
+    align-items: center;
+    font-size: 9px;
+    font-family: 'JetBrains Mono', monospace;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--chalk-soft);
+    padding: 5px 9px;
+    border: 1px solid var(--line);
+    background: var(--void);
+    justify-self: start;
+    font-weight: 500;
+  }
+  .phase.discovery { border-color: var(--chalk-muted); color: var(--chalk-soft); }
+  .phase.concept { border-color: var(--amber); color: var(--amber); }
+  .phase.design { border-color: var(--lime); color: var(--lime); }
+  .phase.build { border-color: var(--lime-dim); color: var(--lime-dim); }
+  .phase.delivery { border-color: var(--red); color: var(--red); }
+  .status {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 10px;
+    font-family: 'JetBrains Mono', monospace;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--chalk-soft);
+  }
+  .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--chalk-muted); }
+  .dot.go { background: var(--lime); box-shadow: 0 0 0 3px rgba(200, 249, 98, 0.15); }
+  .dot.wait { background: var(--amber); box-shadow: 0 0 0 3px rgba(232, 196, 107, 0.15); }
+  .dot.hot { background: var(--red); box-shadow: 0 0 0 3px rgba(232, 107, 75, 0.2); animation: pulse 2s infinite; }
+  @keyframes pulse { 50% { box-shadow: 0 0 0 6px rgba(232, 107, 75, 0.08); } }
+  .deadline { font-size: 13px; color: var(--chalk-soft); text-align: right; font-variant-numeric: tabular-nums; font-family: 'JetBrains Mono', monospace; font-weight: 400; }
+  .deadline.soon { color: var(--red); font-weight: 500; }
+
+  /* Right column */
+  .right-col { display: flex; flex-direction: column; gap: 44px; }
+
+  /* Capacity */
+  .capacity { background: var(--void-soft); border: 1px solid var(--line); padding: 6px 20px 20px; }
+  .person {
+    display: grid;
+    grid-template-columns: 110px 1fr 40px;
+    gap: 14px;
+    align-items: center;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--line);
+  }
+  .person:last-child { border-bottom: none; }
+  .person .name { font-size: 14px; font-weight: 500; color: var(--chalk); }
+  .person .role { font-size: 9px; color: var(--chalk-muted); font-family: 'JetBrains Mono', monospace; letter-spacing: 0.08em; text-transform: uppercase; display: block; margin-top: 3px; }
+  .bar {
+    height: 6px;
+    background: var(--void);
+    position: relative;
+    overflow: hidden;
+    border-radius: 0;
+  }
+  .bar-fill {
+    height: 100%;
+    background: var(--chalk);
+    transition: width 1.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+  .bar-fill.over { background: var(--red); }
+  .bar-fill.light { background: var(--lime); }
+  .pct { font-size: 11px; text-align: right; color: var(--chalk-soft); font-variant-numeric: tabular-nums; font-family: 'JetBrains Mono', monospace; }
+  .cap-note {
+    font-size: 12px;
+    color: var(--chalk-muted);
+    margin-top: 16px;
+    line-height: 1.55;
+    padding-top: 14px;
+    border-top: 1px dotted var(--line);
+  }
+
+  /* Week ahead */
+  .deadlines { background: var(--void-soft); border: 1px solid var(--line); padding: 4px 20px; }
+  .deadline-item {
+    display: grid;
+    grid-template-columns: 56px 1fr;
+    gap: 18px;
+    padding: 18px 0;
+    border-bottom: 1px solid var(--line);
+    align-items: center;
+  }
+  .deadline-item .day {
+    font-size: 30px;
+    font-weight: 500;
+    line-height: 1;
+    color: var(--lime);
+    letter-spacing: -0.03em;
+  }
+  .deadline-item .day small {
+    font-size: 9px;
+    display: block;
+    color: var(--chalk-muted);
+    font-family: 'JetBrains Mono', monospace;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-top: 6px;
+    font-weight: 400;
+  }
+  .deadline-item .what { font-size: 14px; font-weight: 500; color: var(--chalk); }
+  .deadline-item .detail { font-size: 11px; color: var(--chalk-muted); margin-top: 4px; font-family: 'JetBrains Mono', monospace; letter-spacing: 0.04em; text-transform: uppercase; }
+
+  /* Pipeline */
+  .pipeline { margin-top: 56px; border-top: 1px solid var(--line); padding-top: 36px; }
+  .pipeline-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    background: var(--void-soft);
+    border: 1px solid var(--line);
+  }
+  .stage {
+    padding: 24px 22px 28px;
+    border-right: 1px solid var(--line);
+    min-height: 160px;
+  }
+  .stage:last-child { border-right: none; }
+  .stage .stage-label { color: var(--chalk-muted); margin-bottom: 16px; }
+  .stage .stage-count {
+    font-size: 44px;
+    font-weight: 500;
+    letter-spacing: -0.04em;
+    margin-bottom: 8px;
+    line-height: 1;
+    color: var(--chalk);
+  }
+  .stage .stage-value { font-size: 10px; color: var(--chalk-muted); font-family: 'JetBrains Mono', monospace; letter-spacing: 0.08em; text-transform: uppercase; }
+  .stage ul { list-style: none; margin-top: 16px; }
+  .stage li {
+    font-size: 12px;
+    color: var(--chalk-soft);
+    padding: 6px 0;
+    border-top: 1px dotted var(--line);
+  }
+  .stage li:first-child { border-top: none; }
+
+  /* Principles strip */
+  .principles {
+    margin-top: 56px;
+    padding: 32px 28px;
+    background: var(--void-soft);
+    border: 1px solid var(--line);
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 32px;
+  }
+  .principle {
+    display: flex;
+    align-items: baseline;
+    gap: 14px;
+    font-size: 22px;
+    font-weight: 500;
+    letter-spacing: -0.02em;
+    color: var(--chalk);
+  }
+  .principle .num {
+    font-size: 9px;
+    font-family: 'JetBrains Mono', monospace;
+    letter-spacing: 0.12em;
+    color: var(--lime);
+    font-weight: 400;
+  }
+
+  /* Footer */
+  footer {
+    margin-top: 64px;
+    padding-top: 24px;
+    border-top: 1px solid var(--line);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: var(--chalk-muted);
+    font-size: 10px;
+    font-family: 'JetBrains Mono', monospace;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+  footer .sig { color: var(--chalk-soft); }
+
+  /* Animations */
+  section, .stats, .note, .briefing, .principles, header { animation: rise 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) backwards; }
+  header { animation-delay: 0s; }
+  .note { animation-delay: 0.06s; }
+  .briefing { animation-delay: 0.12s; }
+  .stats { animation-delay: 0.2s; }
+  .grid section:nth-child(1) { animation-delay: 0.28s; }
+  .grid section:nth-child(2) { animation-delay: 0.36s; }
+  .pipeline { animation: rise 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) 0.44s backwards; }
+  .principles { animation-delay: 0.52s; }
+  @keyframes rise {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @media (max-width: 960px) {
+    body { padding: 90px 24px 60px; }
+    .nav-pill { padding: 12px 16px; gap: 12px; }
+    .nav-pill .nav-date span:first-child { display: none; }
+    .nav-pill .nav-wordmark { font-size: 12px; letter-spacing: 0.18em; }
+    .grid { grid-template-columns: 1fr; gap: 40px; }
+    .stats { grid-template-columns: repeat(2, 1fr); }
+    .stat:nth-child(2) { border-right: none; }
+    .timezones { grid-template-columns: repeat(2, 1fr); }
+    .tz:nth-child(2) { border-right: none; }
+    .tz:nth-child(1), .tz:nth-child(2) { border-bottom: 1px solid var(--line); }
+    .pipeline-grid { grid-template-columns: repeat(2, 1fr); }
+    .stage:nth-child(2) { border-right: none; }
+    .stage:nth-child(1), .stage:nth-child(2) { border-bottom: 1px solid var(--line); }
+    .project { grid-template-columns: 1fr 90px; }
+    .project .phase, .project .deadline { display: none; }
+    header { flex-direction: column; align-items: flex-start; gap: 20px; }
+    .meta { text-align: left; }
+    .brand h1 { font-size: 42px; }
+    .briefing { grid-template-columns: 1fr; gap: 20px; padding: 28px 0; }
+    .briefing-text { font-size: 18px; }
+    .principles { grid-template-columns: repeat(2, 1fr); gap: 20px; padding: 24px; }
+    .principle { font-size: 18px; }
+    .win-rate { display: flex; margin-left: 0; margin-top: 10px; align-self: flex-start; }
+    section h2 { flex-wrap: wrap; gap: 8px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="nav-pill">
+  <div class="nav-logo">
+    <svg class="nav-mark" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+      <g stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="square">
+        <line x1="6.5" y1="2.5" x2="6.5" y2="17.5"/>
+        <line x1="13.5" y1="2.5" x2="13.5" y2="17.5"/>
+        <line x1="2.5" y1="6.5" x2="17.5" y2="6.5"/>
+        <line x1="2.5" y1="13.5" x2="17.5" y2="13.5"/>
+      </g>
+    </svg>
+    <span class="nav-wordmark">THINKSEB</span>
+  </div>
+  <div class="nav-date"><span>Week 15 · Thursday</span><span class="nav-date-num">09.04.2026</span></div>
+</div>
+
+<header>
+  <div class="brand">
+    <div class="eyebrow mono"><span class="smiley"></span> Studio Operations / Remote</div>
+    <h1>the morning view<span class="lime-dot">.</span></h1>
+  </div>
+</header>
+
+<div class="note">
+  <strong>A note on this mockup.</strong> Built for my application to ThinkSeb as a studio manager. I don't know what system the studio runs on internally, so I made this tool-agnostic — it's the view I'd want to build in my first 30 days, regardless of whether it lives in Notion, Asana, ClickUp, or a combination. The point isn't the stack. It's knowing what a studio manager needs to see before the first coffee of the day.
+</div>
+
+<div class="briefing">
+  <div class="briefing-label mono"><span class="smiley"></span> Morning briefing</div>
+  <div class="briefing-text">
+    Two deliveries land today — <strong>Helix</strong> design review at 3pm and <strong>Verity</strong> final files. Marieke is running hot; worth reshuffling her afternoon so she's not doing both. <strong>Parallel Labs</strong> still owes R2 feedback from Monday — time for a gentle chase.
+  </div>
+</div>
+
+<div class="stats">
+  <div class="stat">
+    <div class="label mono">Live projects</div>
+    <div class="value"><span data-count="11">0</span></div>
+    <div class="delta up">+2 this week</div>
+  </div>
+  <div class="stat">
+    <div class="label mono">Team utilisation</div>
+    <div class="value"><span data-count="82">0</span><span style="font-size:24px">%</span></div>
+    <div class="delta">across Mon–Thu</div>
+  </div>
+  <div class="stat">
+    <div class="label mono">Outstanding</div>
+    <div class="value">€<span data-count="38">0</span>k</div>
+    <div class="delta down">1 over 30 days</div>
+  </div>
+  <div class="stat">
+    <div class="label mono">Billed this month</div>
+    <div class="value">€<span data-count="94">0</span>k</div>
+    <div class="sparkline-wrap">
+      <svg class="sparkline" viewBox="0 0 90 22" preserveAspectRatio="none">
+        <polyline points="2,17 17,15 32,18 47,11 62,13 77,6 88,4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/>
+        <circle cx="88" cy="4" r="2" fill="currentColor"/>
+      </svg>
+      <span class="sparkline-label">6mo trend</span>
+    </div>
+  </div>
+</div>
+
+<div class="timezones">
+  <div class="tz"><span class="tz-city mono">Amsterdam</span><span class="tz-time" id="tz-ams">—</span></div>
+  <div class="tz"><span class="tz-city mono">Barcelona</span><span class="tz-time" id="tz-bcn">—</span></div>
+  <div class="tz"><span class="tz-city mono">Utrecht</span><span class="tz-time" id="tz-utr">—</span></div>
+  <div class="tz"><span class="tz-city mono">Lisbon</span><span class="tz-time" id="tz-lis">—</span></div>
+</div>
+
+<div class="grid">
+  <section>
+    <h2>Live projects <span class="count">11 IN FLIGHT</span></h2>
+    <div class="projects">
+
+      <div class="project">
+        <div>
+          <div class="name">Brand system + website</div>
+          <div class="client">Helix AI · Berlin</div>
+        </div>
+        <span class="phase design">Design</span>
+        <div class="status"><span class="dot hot"></span>Review today</div>
+        <div class="deadline soon">Today</div>
+      </div>
+
+      <div class="project">
+        <div>
+          <div class="name">Logo + brand guidelines</div>
+          <div class="client">Verity Health · London</div>
+        </div>
+        <span class="phase delivery">Delivery</span>
+        <div class="status"><span class="dot hot"></span>Final files</div>
+        <div class="deadline soon">Today</div>
+      </div>
+
+      <div class="project">
+        <div>
+          <div class="name">Motion reel — product launch</div>
+          <div class="client">Nordhaus Solar · Rotterdam</div>
+        </div>
+        <span class="phase build">Build</span>
+        <div class="status"><span class="dot go"></span>On track</div>
+        <div class="deadline">16 Apr</div>
+      </div>
+
+      <div class="project">
+        <div>
+          <div class="name">Identity exploration R2</div>
+          <div class="client">Parallel Labs · Remote</div>
+        </div>
+        <span class="phase concept">Concept</span>
+        <div class="status"><span class="dot wait"></span>Awaiting feedback</div>
+        <div class="deadline">15 Apr</div>
+      </div>
+
+      <div class="project">
+        <div>
+          <div class="name">Website build — phase 2</div>
+          <div class="client">Mareva Estates · Marbella</div>
+        </div>
+        <span class="phase build">Build</span>
+        <div class="status"><span class="dot go"></span>In dev</div>
+        <div class="deadline">22 Apr</div>
+      </div>
+
+      <div class="project">
+        <div>
+          <div class="name">Discovery workshop + brief</div>
+          <div class="client">Altair Robotics · Zurich</div>
+        </div>
+        <span class="phase discovery">Discovery</span>
+        <div class="status"><span class="dot go"></span>Workshop Mon</div>
+        <div class="deadline">14 Apr</div>
+      </div>
+
+      <div class="project">
+        <div>
+          <div class="name">Character design + motion</div>
+          <div class="client">Junco Protocol · Remote</div>
+        </div>
+        <span class="phase design">Design</span>
+        <div class="status"><span class="dot go"></span>In design</div>
+        <div class="deadline">23 Apr</div>
+      </div>
+
+      <div class="project">
+        <div>
+          <div class="name">Full brand + web + motion</div>
+          <div class="client">Tessera Tools · Munich</div>
+        </div>
+        <span class="phase concept">Concept</span>
+        <div class="status"><span class="dot wait"></span>R1 with client</div>
+        <div class="deadline">29 Apr</div>
+      </div>
+
+    </div>
+  </section>
+
+  <div class="right-col">
+
+    <section>
+      <h2>Team this week <span class="count">6 PEOPLE</span></h2>
+      <div class="capacity">
+        <div class="person">
+          <div><div class="name">Marieke</div><span class="role">Creative Lead · AMS</span></div>
+          <div class="bar"><div class="bar-fill over" style="width: 108%"></div></div>
+          <div class="pct">108</div>
+        </div>
+        <div class="person">
+          <div><div class="name">Joris</div><span class="role">Sr. Designer · AMS</span></div>
+          <div class="bar"><div class="bar-fill" style="width: 92%"></div></div>
+          <div class="pct">92</div>
+        </div>
+        <div class="person">
+          <div><div class="name">Elena</div><span class="role">Designer · BCN</span></div>
+          <div class="bar"><div class="bar-fill" style="width: 86%"></div></div>
+          <div class="pct">86</div>
+        </div>
+        <div class="person">
+          <div><div class="name">Stijn</div><span class="role">Motion · Utrecht</span></div>
+          <div class="bar"><div class="bar-fill over" style="width: 104%"></div></div>
+          <div class="pct">104</div>
+        </div>
+        <div class="person">
+          <div><div class="name">Ana</div><span class="role">Designer · Lisbon</span></div>
+          <div class="bar"><div class="bar-fill" style="width: 74%"></div></div>
+          <div class="pct">74</div>
+        </div>
+        <div class="person">
+          <div><div class="name">Daan</div><span class="role">Dev · AMS</span></div>
+          <div class="bar"><div class="bar-fill light" style="width: 52%"></div></div>
+          <div class="pct">52</div>
+        </div>
+        <div class="cap-note">
+          Two people running over. Worth a conversation about reshuffling the Helix review or pulling Ana in to support Stijn on motion.
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h2>Week ahead <span class="count">NEXT 4 DAYS</span></h2>
+      <div class="deadlines">
+        <div class="deadline-item">
+          <div class="day">09<small>Thu</small></div>
+          <div>
+            <div class="what">Helix AI — design review</div>
+            <div class="detail">15:00 CET · Marieke</div>
+          </div>
+        </div>
+        <div class="deadline-item">
+          <div class="day">09<small>Thu</small></div>
+          <div>
+            <div class="what">Verity Health — final files</div>
+            <div class="detail">Brand guidelines + asset pack</div>
+          </div>
+        </div>
+        <div class="deadline-item">
+          <div class="day">14<small>Mon</small></div>
+          <div>
+            <div class="what">Altair Robotics — discovery</div>
+            <div class="detail">Workshop · Joris + Marieke</div>
+          </div>
+        </div>
+        <div class="deadline-item">
+          <div class="day">15<small>Tue</small></div>
+          <div>
+            <div class="what">Parallel Labs — R2 feedback due</div>
+            <div class="detail">Chasing since Monday</div>
+          </div>
+        </div>
+        <div class="deadline-item">
+          <div class="day">16<small>Wed</small></div>
+          <div>
+            <div class="what">Nordhaus — motion reel QA</div>
+            <div class="detail">Internal review before delivery</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <h2>Blockers <span class="count">3 STUCK</span></h2>
+      <div class="blockers">
+        <div class="blocker">
+          <div>
+            <div class="blocker-title">Parallel Labs — R2 feedback</div>
+            <div class="blocker-detail">Waiting since Monday</div>
+          </div>
+          <div class="blocker-days">4 days</div>
+        </div>
+        <div class="blocker">
+          <div>
+            <div class="blocker-title">De Bijenkorf — project brief</div>
+            <div class="blocker-detail">Chasing account lead</div>
+          </div>
+          <div class="blocker-days">6 days</div>
+        </div>
+        <div class="blocker">
+          <div>
+            <div class="blocker-title">Mareva — phase 2 sign-off</div>
+            <div class="blocker-detail">Legal review on hold</div>
+          </div>
+          <div class="blocker-days">9 days</div>
+        </div>
+      </div>
+    </section>
+
+  </div>
+</div>
+
+<section class="shipped-section">
+  <h2>Recently shipped <span class="count">LAST 30 DAYS</span></h2>
+  <div class="shipped">
+    <div class="ship-item">
+      <div>
+        <div class="ship-name">Oun — identity + motion package</div>
+        <div class="ship-client">AI transaction coordinator · Amsterdam</div>
+      </div>
+      <div class="ship-date">02 Apr</div>
+    </div>
+    <div class="ship-item">
+      <div>
+        <div class="ship-name">Rinnai — solar brand refresh</div>
+        <div class="ship-client">Home energy · Rotterdam</div>
+      </div>
+      <div class="ship-date">28 Mar</div>
+    </div>
+    <div class="ship-item">
+      <div>
+        <div class="ship-name">DTI — website phase 1</div>
+        <div class="ship-client">Global tooling · Munich</div>
+      </div>
+      <div class="ship-date">24 Mar</div>
+    </div>
+    <div class="ship-item">
+      <div>
+        <div class="ship-name">BeyondAge — brand system</div>
+        <div class="ship-client">Health prediction · Remote</div>
+      </div>
+      <div class="ship-date">19 Mar</div>
+    </div>
+    <div class="ship-item">
+      <div>
+        <div class="ship-name">Villas del Sol — full identity</div>
+        <div class="ship-client">Real estate · Marbella</div>
+      </div>
+      <div class="ship-date">14 Mar</div>
+    </div>
+  </div>
+</section>
+
+<div class="pipeline">
+  <h2>
+    <span>New business <span class="count">PIPELINE</span></span>
+    <span class="win-rate"><span class="wr-label">Q1 win rate</span><span class="wr-value">38%</span></span>
+  </h2>
+  <div class="pipeline-grid">
+    <div class="stage">
+      <div class="stage-label mono">Inbound</div>
+      <div class="stage-count">5</div>
+      <div class="stage-value">≈ €90k potential</div>
+      <ul>
+        <li>Kairo Finance — brand + web</li>
+        <li>Orion Biotech — identity</li>
+        <li>Felix &amp; Fern — website</li>
+        <li>Northwind DAO — motion</li>
+        <li>Casa Lumen — real estate</li>
+      </ul>
+    </div>
+    <div class="stage">
+      <div class="stage-label mono">In conversation</div>
+      <div class="stage-count">3</div>
+      <div class="stage-value">≈ €145k proposed</div>
+      <ul>
+        <li>Obsidian AI — full brand</li>
+        <li>Solstice Capital — website</li>
+        <li>Marquez Studios — motion</li>
+      </ul>
+    </div>
+    <div class="stage">
+      <div class="stage-label mono">Proposal out</div>
+      <div class="stage-count">2</div>
+      <div class="stage-value">≈ €82k pending</div>
+      <ul>
+        <li>Helix AI — phase 2 extension</li>
+        <li>Tessera Tools — web build</li>
+      </ul>
+    </div>
+    <div class="stage">
+      <div class="stage-label mono">Signed</div>
+      <div class="stage-count">2</div>
+      <div class="stage-value">€71k confirmed</div>
+      <ul>
+        <li>Altair Robotics — brand</li>
+        <li>Junco Protocol — character + motion</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<div class="principles">
+  <div class="principle"><span class="num">01</span> Strategy</div>
+  <div class="principle"><span class="num">02</span> Talent</div>
+  <div class="principle"><span class="num">03</span> Experience</div>
+  <div class="principle"><span class="num">04</span> Performance</div>
+</div>
+
+<footer>
+  <div>Mockup · not connected to live data</div>
+  <div class="sig">Prepared by Sophie Mason · for ThinkSeb</div>
+</footer>
+
+<script>
+  // Count-up animation for stat values
+  function animateCount(el) {
+    const target = parseInt(el.dataset.count, 10);
+    const duration = 1600;
+    const start = performance.now();
+    const step = (now) => {
+      const progress = Math.min((now - start) / duration, 1);
+      const eased = 1 - Math.pow(1 - progress, 3);
+      el.textContent = Math.round(target * eased);
+      if (progress < 1) requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
+  }
+  document.querySelectorAll('[data-count]').forEach(el => {
+    setTimeout(() => animateCount(el), 400);
+  });
+
+  // Live timezone clocks
+  function formatTime(tz) {
+    return new Intl.DateTimeFormat('en-GB', {
+      hour: '2-digit',
+      minute: '2-digit',
+      timeZone: tz,
+      hour12: false
+    }).format(new Date());
+  }
+  function updateClocks() {
+    const ams = document.getElementById('tz-ams');
+    const bcn = document.getElementById('tz-bcn');
+    const utr = document.getElementById('tz-utr');
+    const lis = document.getElementById('tz-lis');
+    if (ams) ams.textContent = formatTime('Europe/Amsterdam');
+    if (bcn) bcn.textContent = formatTime('Europe/Madrid');
+    if (utr) utr.textContent = formatTime('Europe/Amsterdam');
+    if (lis) lis.textContent = formatTime('Europe/Lisbon');
+  }
+  updateClocks();
+  setInterval(updateClocks, 15000);
+</script>
+
+</body>
+</html>
